@@ -3,14 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#D4A054">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="AMITAI">
-<meta name="description" content="Your personal Carnatic music teacher. Learn swaras through guided practice, ear training, and an AI guru.">
-<link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<link rel="icon" type="image/png" href="/icon-192.png">
 <title>AMITAI — Carnatic Music Teacher</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -177,7 +169,15 @@ function randomEnc(){return ENCOURAGEMENTS[Math.floor(Math.random()*ENCOURAGEMEN
 // ─── Audio Engine (Tanpura-style synthesis) ───
 class AudioEngine{
   constructor(){this.ctx=null;this.droneNodes=[];this.currentTone=null;}
-  init(){if(!this.ctx)this.ctx=new(window.AudioContext||window.webkitAudioContext)();if(this.ctx.state==="suspended")this.ctx.resume();}
+  init(){
+    if(!this.ctx)this.ctx=new(window.AudioContext||window.webkitAudioContext)();
+    if(this.ctx.state==="suspended"){this.ctx.resume();}
+    // iOS unlock: play a silent buffer on first interaction
+    if(!this._unlocked){
+      const buf=this.ctx.createBuffer(1,1,22050);const src=this.ctx.createBufferSource();
+      src.buffer=buf;src.connect(this.ctx.destination);src.start(0);this._unlocked=true;
+    }
+  }
   getFreq(b,s){return b*Math.pow(2,s/12);}
   // Clean sine tone — plays for the full specified duration
   playTone(f,d=6,v=0.25){
@@ -503,17 +503,26 @@ function WelcomeScreen({dispatch}){
     <p style={{fontSize:14.5,color:"rgba(212,160,84,0.55)",marginBottom:8}}>Your personal Carnatic music teacher</p>
     <div style={{width:60,height:1,background:"rgba(212,160,84,0.2)",margin:"16px auto 24px"}}/>
     <p className="subtext" style={{marginBottom:36}}>Learn the seven swaras — Sa Re Ga Ma Pa Dha Ni — through tanpura-guided practice, ear training, and an AI guru. No experience needed.</p>
-    <button className="btn-primary" onClick={()=>dispatch({type:"SET_SCREEN",payload:"scaleSelect"})}>Begin Your Journey</button>
+    <button className="btn-primary" onClick={()=>{audio.init();dispatch({type:"SET_SCREEN",payload:"scaleSelect"});}}>Begin Your Journey</button>
   </div>);
 }
 
 function ScaleSelectScreen({dispatch}){
+  const[preview,setPreview]=useState(null);
+  const select=(s)=>{
+    if(preview===s){dispatch({type:"SET_SCALE",payload:s});dispatch({type:"SET_SCREEN",payload:"saPaSa"});}
+    else{audio.init();audio.playShort(BASE_FREQS[s],1.5,0.2);setPreview(s);}
+  };
   return(<div className="screen"><h2 className="heading">Find Your Shruti</h2>
-    <p className="subtext" style={{marginBottom:28}}>Your shruti (base pitch) sets Sa — your home note. Hover to hear, click to select.</p>
+    <p className="subtext" style={{marginBottom:28}}>Your shruti (base pitch) sets Sa — your home note. Tap to hear, tap again to select.</p>
     <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:11,maxWidth:320}}>
-      {SCALES.map(s=><button key={s} className="scale-btn" onMouseEnter={()=>{audio.init();audio.playShort(BASE_FREQS[s],1,0.15);}}
-        onClick={()=>{dispatch({type:"SET_SCALE",payload:s});dispatch({type:"SET_SCREEN",payload:"saPaSa"});}}>{s}</button>)}
-    </div><div style={{marginTop:12,fontSize:11,color:"rgba(245,230,200,0.25)"}}>Recommended: <b className="gold">C</b> or <b className="gold">D</b></div></div>);
+      {SCALES.map(s=><button key={s} className="scale-btn" style={preview===s?{background:"rgba(212,160,84,0.25)",borderColor:"#D4A054",color:"#F5E6C8"}:{}}
+        onMouseEnter={()=>{audio.init();audio.playShort(BASE_FREQS[s],1,0.15);}}
+        onClick={()=>select(s)}>{s}</button>)}
+    </div>
+    {preview&&<div style={{marginTop:14,fontSize:13,color:"#D4A054",textAlign:"center"}}>Tap <b>{preview}</b> again to confirm</div>}
+    {!preview&&<div style={{marginTop:14,fontSize:11,color:"rgba(245,230,200,0.25)"}}>Recommended: <b className="gold">C</b> or <b className="gold">D</b></div>}
+  </div>);
 }
 
 function SaPaSaScreen({state,dispatch}){
