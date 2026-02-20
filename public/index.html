@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#D4A054">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AMITAI">
+<meta name="description" content="Your personal Carnatic music teacher. Learn swaras through guided practice, ear training, and an AI guru.">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="icon" type="image/png" href="/icon-192.png">
+<title>AMITAI — Carnatic Music Teacher</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0D0805;color:#F5E6C8;font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:rgba(212,160,84,0.2);border-radius:4px;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
+@keyframes shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+.screen{display:flex;flex-direction:column;align-items:center;max-width:560px;width:100%;animation:fadeIn 0.4s ease;}
+.heading{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#F5E6C8;margin-bottom:10px;text-align:center;}
+.badge{font-size:11px;color:rgba(212,160,84,0.45);background:rgba(212,160,84,0.06);border:1px solid rgba(212,160,84,0.1);border-radius:18px;padding:3px 12px;margin-bottom:16px;display:inline-block;}
+.subtext{color:rgba(245,230,200,0.4);font-size:13.5px;max-width:400px;text-align:center;margin-bottom:24px;line-height:1.6;}
+.gold{color:#D4A054;}
+.btn-primary{background:linear-gradient(135deg,#D4A054,#B8843E);border:none;border-radius:13px;padding:15px 36px;color:#1A0F0A;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;box-shadow:0 4px 18px rgba(212,160,84,0.25);transition:all 0.2s;}
+.btn-primary:hover{box-shadow:0 6px 24px rgba(212,160,84,0.35);transform:translateY(-1px);}
+.btn-secondary{background:rgba(212,160,84,0.1);border:1px solid rgba(212,160,84,0.2);border-radius:10px;padding:10px 18px;color:#D4A054;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;}
+.btn-ghost{background:none;border:1px solid rgba(245,230,200,0.1);border-radius:10px;padding:10px 18px;color:rgba(245,230,200,0.4);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.btn-choice{background:rgba(255,255,255,0.03);border:1.5px solid rgba(212,160,84,0.15);border-radius:11px;padding:13px 18px;color:#F5E6C8;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;text-align:center;transition:all 0.2s;width:100%;}
+.btn-choice:hover{border-color:#D4A054;background:rgba(212,160,84,0.08);}
+.scale-btn{width:68px;height:68px;border-radius:13px;background:rgba(255,255,255,0.03);border:1.5px solid rgba(212,160,84,0.12);color:rgba(245,230,200,0.5);font-size:17px;font-family:'Cormorant Garamond',serif;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
+.scale-btn:hover{background:rgba(212,160,84,0.18);border-color:#D4A054;color:#F5E6C8;}
+.raga-card{background:rgba(255,255,255,0.025);border:1.5px solid rgba(212,160,84,0.12);border-radius:15px;padding:16px 14px;cursor:pointer;text-align:left;transition:all 0.2s;position:relative;}
+.raga-card:hover{background:rgba(212,160,84,0.1);}
+.raga-card.recommended{border-color:#D4A054;}
+.raga-card .rec-tag{position:absolute;top:-8px;right:12px;background:#D4A054;color:#1A0F0A;font-size:9px;font-weight:600;padding:2px 8px;border-radius:5px;}
+.header{padding:14px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(212,160,84,0.07);}
+.header-logo{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:#D4A054;cursor:pointer;}
+.header-info{display:flex;gap:12px;align-items:center;font-size:11px;color:rgba(245,230,200,0.35);flex-wrap:wrap;}
+.sarali-table{width:100%;border-collapse:collapse;font-family:'Cormorant Garamond',serif;}
+.sarali-table td{padding:8px 4px;text-align:center;font-size:16px;font-weight:500;color:#F5E6C8;transition:all 0.1s;}
+.sarali-table td.active{font-size:20px;font-weight:700;color:#1A0F0A;background:#D4A054;border-radius:6px;}
+.sarali-table td.rest{color:rgba(212,160,84,0.2);}
+.sarali-table td.label-cell{padding:8px 6px;font-size:10px;color:rgba(212,160,84,0.4);font-family:'DM Sans',sans-serif;white-space:nowrap;border-right:1px solid rgba(212,160,84,0.08);text-align:left;}
+.sarali-table td.beat-header{padding:6px 4px;text-align:center;font-size:10px;color:rgba(212,160,84,0.3);font-family:'DM Sans',sans-serif;width:11%;}
+.metro-dot{width:10px;height:10px;border-radius:50%;background:rgba(212,160,84,0.15);transition:all 0.1s;}
+.metro-dot.active{width:14px;height:14px;background:#D4A054;box-shadow:0 0 12px rgba(212,160,84,0.4);}
+.tempo-btn{border-radius:8px;padding:5px 10px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;background:rgba(255,255,255,0.04);border:1px solid rgba(212,160,84,0.12);color:rgba(245,230,200,0.4);}
+.tempo-btn.active{background:rgba(212,160,84,0.2);border-color:#D4A054;color:#D4A054;}
+.hub-card{background:rgba(255,255,255,0.025);border:1.5px solid rgba(212,160,84,0.12);border-radius:16px;padding:20px 18px;cursor:pointer;text-align:left;transition:all 0.25s;width:100%;}
+.hub-card:hover{background:rgba(212,160,84,0.1);border-color:#D4A054;transform:translateY(-2px);box-shadow:0 6px 20px rgba(212,160,84,0.12);}
+.hub-card .hub-icon{font-size:28px;margin-bottom:8px;}
+.hub-card .hub-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:#F5E6C8;margin-bottom:4px;}
+.hub-card .hub-desc{font-size:12px;color:rgba(245,230,200,0.4);line-height:1.5;}
+.hub-card.amit{border-color:rgba(212,160,84,0.35);background:linear-gradient(135deg,rgba(212,160,84,0.06),rgba(212,160,84,0.02));}
+.hub-card.amit:hover{border-color:#D4A054;background:linear-gradient(135deg,rgba(212,160,84,0.15),rgba(212,160,84,0.06));}
+.amit-chat{display:flex;flex-direction:column;height:100%;max-height:calc(100vh - 120px);min-height:400px;}
+.amit-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10;}
+.amit-bubble{padding:12px 16px;border-radius:14px;max-width:88%;font-size:14px;line-height:1.6;animation:fadeIn 0.3s ease;}
+.amit-bubble.user{align-self:flex-end;background:rgba(212,160,84,0.12);border:1px solid rgba(212,160,84,0.2);border-radius:14px 14px 4px 14px;}
+.amit-bubble.guru{align-self:flex-start;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:14px 14px 14px 4px;}
+.amit-bubble .play-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(212,160,84,0.15);border:1px solid rgba(212,160,84,0.3);border-radius:8px;padding:6px 12px;color:#D4A054;font-size:12px;cursor:pointer;margin-top:8px;font-family:'DM Sans',sans-serif;}
+.amit-bubble .play-btn:hover{background:rgba(212,160,84,0.25);}
+.amit-input{padding:12px 16px;border-top:1px solid rgba(212,160,84,0.1);display:flex;gap:8px;background:rgba(0,0,0,0.2);}
+.amit-input input{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(212,160,84,0.12);border-radius:10px;padding:10px 14px;color:#F5E6C8;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;}
+.amit-input button{background:#D4A054;border:none;border-radius:10px;padding:0 16px;color:#1A0F0A;font-weight:600;cursor:pointer;font-size:14px;}
+.home-btn{position:fixed;bottom:20px;left:20px;z-index:1000;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(245,230,200,0.1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:rgba(245,230,200,0.5);transition:all 0.2s;}
+.home-btn:hover{background:rgba(212,160,84,0.15);border-color:#D4A054;color:#D4A054;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<script type="text/babel">
+const {useState,useEffect,useRef,useCallback,useReducer}=React;
+
+const SCALES=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const BASE_FREQS={C:261.63,"C#":277.18,D:293.66,"D#":311.13,E:329.63,F:349.23,"F#":369.99,G:392.0,"G#":415.3,A:440.0,"A#":466.16,B:493.88};
+// 16 Swarasthana reference: Sa=0, R1=1, R2/G1=2, R3/G2=3, G3=4, M1=5, M2=6, Pa=7, D1=8, D2/N1=9, D3/N2=10, N3=11, Ṡa=12
+const SWARA_VARIANTS={
+  0:"Sa", 1:"R₁", 2:"R₂", 3:"R₃", 4:"G₃", 5:"M₁", 6:"M₂", 7:"Pa", 8:"D₁", 9:"D₂", 10:"D₃", 11:"N₃", 12:"Ṡa",
+  // When the same semitone is used as Ga instead of Ri, or Ni instead of Dha:
+  "G1":2, "G2":3, "N1":9, "N2":10
+};
+// Maps semitone+swara name to proper variant label
+function variantLabel(swara,semi){
+  if(swara==="Sa"||swara==="Ṡa")return swara;
+  if(swara==="Pa")return "Pa";
+  if(swara==="Re"){return semi===1?"R₁":semi===2?"R₂":semi===3?"R₃":"R?";}
+  if(swara==="Ga"){return semi===2?"G₁":semi===3?"G₂":semi===4?"G₃":"G?";}
+  if(swara==="Ma"){return semi===5?"M₁":semi===6?"M₂":"M?";}
+  if(swara==="Dha"){return semi===8?"D₁":semi===9?"D₂":semi===10?"D₃":"D?";}
+  if(swara==="Ni"){return semi===9?"N₁":semi===10?"N₂":semi===11?"N₃":"N?";}
+  return swara;
+}
+
+const RAGAS={
+  mayamalavagowla:{name:"Mayamalavagowla",description:"The mother of all ragas — devotional, foundational.",mood:"Evokes shanta rasa (peace) and gentle pathos. A morning raga — its symmetric intervals create a soothing, meditative quality. The first raga every Carnatic student learns.",compositions:"\"Tulasidala Mulache\" — Tyagaraja · \"Srinathadi Guruguho\" — Muthuswami Dikshitar (his very first composition)",arohanam:["Sa","Re","Ga","Ma","Pa","Dha","Ni","Ṡa"],avarohanam:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re","Sa"],semitones:{Sa:0,Re:1,Ga:4,Ma:5,Pa:7,Dha:8,Ni:11,"Ṡa":12},variants:"R₁ G₃ M₁ D₁ N₃"},
+  shankarabharanam:{name:"Shankarabharanam",description:"Bright and joyful — the Western major scale.",mood:"Majestic and mellifluous. Known as the \"Sarva Gamaka Manika Rakti Ragam\" — adorned with all ornamentations. Radiates confidence, devotion, and regal beauty. Suited for all times.",compositions:"\"Swara Raga Sudha\" — Tyagaraja · \"Sami Ninne\" — Veena Kuppayyar (often the first varnam taught to students)",arohanam:["Sa","Re","Ga","Ma","Pa","Dha","Ni","Ṡa"],avarohanam:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re","Sa"],semitones:{Sa:0,Re:2,Ga:4,Ma:5,Pa:7,Dha:9,Ni:11,"Ṡa":12},variants:"R₂ G₃ M₁ D₂ N₃"},
+  mohanam:{name:"Mohanam",description:"Sweet and serene — only 5 notes. Perfect for beginners.",mood:"Enchanting and uplifting. Its name means \"that which captivates.\" With only 5 notes, every swara carries weight — creating bright, optimistic phrases full of charm and sweetness.",compositions:"\"Mohana Rama\" — Tyagaraja · \"Nannu Palimpa\" — Tyagaraja",arohanam:["Sa","Re","Ga","Pa","Dha","Ṡa"],avarohanam:["Ṡa","Dha","Pa","Ga","Re","Sa"],semitones:{Sa:0,Re:2,Ga:4,Pa:7,Dha:9,"Ṡa":12},variants:"R₂ G₃ D₂"},
+  hamsadhwani:{name:"Hamsadhwani",description:"Auspicious and bright — 5 notes, often opens concerts.",mood:"Jubilant and auspicious. Its name means \"the call of the swan.\" A beloved concert opener — its bright, ascending energy creates an immediate sense of celebration and divine welcome.",compositions:"\"Vatapi Ganapatim\" — Muthuswami Dikshitar (one of Carnatic music's most iconic compositions) · \"Raghuvamsa Sudha\" — Patnam Subramanya Iyer",arohanam:["Sa","Re","Ga","Pa","Ni","Ṡa"],avarohanam:["Ṡa","Ni","Pa","Ga","Re","Sa"],semitones:{Sa:0,Re:2,Ga:4,Pa:7,Ni:11,"Ṡa":12},variants:"R₂ G₃ N₃"},
+  kalyani:{name:"Kalyani",description:"Grand and majestic — the 65th melakarta with prati madhyamam.",mood:"The queen of ragas. Light-hearted yet deeply emotional — believed to dispel fear and bring auspiciousness. The raised Ma₂ gives it a distinctive brightness and grandeur unlike any other raga.",compositions:"\"Nidhi Chala Sukhama\" — Tyagaraja (a masterpiece questioning worldly wealth vs devotion) · \"Kamalamba Navavarnam\" — Muthuswami Dikshitar",arohanam:["Sa","Re","Ga","Ma","Pa","Dha","Ni","Ṡa"],avarohanam:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re","Sa"],semitones:{Sa:0,Re:2,Ga:4,Ma:6,Pa:7,Dha:9,Ni:11,"Ṡa":12},variants:"R₂ G₃ M₂ D₂ N₃"},
+  kharaharapriya:{name:"Kharaharapriya",description:"Deep and emotive — the natural minor feel.",mood:"Evokes karuna rasa (compassion and pathos). Named for Lord Shiva — its gentle, minor-toned swaras create a deep emotional pull. One of the four great ragas alongside Shankarabharanam, Kalyani, and Todi.",compositions:"\"Chakkani Raja\" — Tyagaraja · \"Raghunayaka\" — Tyagaraja",arohanam:["Sa","Re","Ga","Ma","Pa","Dha","Ni","Ṡa"],avarohanam:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re","Sa"],semitones:{Sa:0,Re:2,Ga:3,Ma:5,Pa:7,Dha:9,Ni:10,"Ṡa":12},variants:"R₂ G₂ M₁ D₂ N₂"}
+};
+const SA_PA_SA=[{swara:"Sa",semitone:0,dur:6},{swara:"Pa",semitone:7,dur:6},{swara:"Ṡa",semitone:12,dur:6},{swara:"Pa",semitone:7,dur:6},{swara:"Sa",semitone:0,dur:6}];
+
+// Sarali Varisai — 10 exercises. "," = sustain (hold previous note). "–" = tie.
+const SARALI=[
+  {name:"Sarali Varisai 1",subtitle:"Simple ascent & descent",laya:"s r g m | p d | n S || S n d p | m g | r s",lines:[
+    {beats:["Sa","Re","Ga","Ma","Pa","Dha","Ni","Ṡa"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re","Sa"]}
+  ]},
+  {name:"Sarali Varisai 2",subtitle:"Focus on Re & Ni",laya:"s r s r | s r | g m || s r g m | p d | n S || S n S n | S n | d p || S n d p | m g | r s",lines:[
+    {beats:["Sa","Re","Sa","Re","Sa","Re","Ga","Ma"]},
+    {beats:["Sa","Re","Ga","Ma","Pa","Dha","Ni","Ṡa"]},
+    {beats:["Ṡa","Ni","Ṡa","Ni","Ṡa","Ni","Dha","Pa"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re","Sa"]}
+  ]},
+  {name:"Sarali Varisai 3",subtitle:"Focus on Ga & Dha",laya:"s r g s | r g | s r || s r g m | p d | n S || S n d S | n d | S n || S n d p | m g | r s",lines:[
+    {beats:["Sa","Re","Ga","Sa","Re","Ga","Sa","Re"]},
+    {beats:["Sa","Re","Ga","Ma","Pa","Dha","Ni","Ṡa"]},
+    {beats:["Ṡa","Ni","Dha","Ṡa","Ni","Dha","Ṡa","Ni"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re","Sa"]}
+  ]},
+  {name:"Sarali Varisai 4",subtitle:"Focus on Ma & Pa",laya:"s r g m | s r | g m || s r g m | p d | n S || S n d p | S n | d p || S n d p | m g | r s",lines:[
+    {beats:["Sa","Re","Ga","Ma","Sa","Re","Ga","Ma"]},
+    {beats:["Sa","Re","Ga","Ma","Pa","Dha","Ni","Ṡa"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ṡa","Ni","Dha","Pa"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re","Sa"]}
+  ]},
+  {name:"Sarali Varisai 5",subtitle:"Focus on Pa & Ma (dheergam); and Re, Ni",laya:"s r g m | p , | s r || s r g m | p d | n S || S n d p | m , | S n || S n d p | m g | r s",lines:[
+    {beats:["Sa","Re","Ga","Ma","Pa",",","Sa","Re"]},
+    {beats:["Sa","Re","Ga","Ma","Pa","Dha","Ni","Ṡa"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma",",","Ṡa","Ni"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re","Sa"]}
+  ]},
+  {name:"Sarali Varisai 6",subtitle:"Focus on Ga & Dha",laya:"s r g m | p d | s r || s r g m | p d | n S || S n d p | m g | S n || S n d p | m g | r s",lines:[
+    {beats:["Sa","Re","Ga","Ma","Pa","Dha","Sa","Re"]},
+    {beats:["Sa","Re","Ga","Ma","Pa","Dha","Ni","Ṡa"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma","Ga","Ṡa","Ni"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re","Sa"]}
+  ]},
+  {name:"Sarali Varisai 7",subtitle:"Focus on Ni & Re (dheergam)",laya:"s r g m | p d | n , || s r g m | p d | n S || S n d p | m g | r , || S n d p | m g | r s",lines:[
+    {beats:["Sa","Re","Ga","Ma","Pa","Dha","Ni",","]},
+    {beats:["Sa","Re","Ga","Ma","Pa","Dha","Ni","Ṡa"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re",","]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re","Sa"]}
+  ]},
+  {name:"Sarali Varisai 8",subtitle:"Zig zag — focus on pmgr & mpdn",laya:"s r g m | p m | g r || s r g m | p d | n S || S n d p | m p | d n || S n d p | m g | r s",lines:[
+    {beats:["Sa","Re","Ga","Ma","Pa","Ma","Ga","Re"]},
+    {beats:["Sa","Re","Ga","Ma","Pa","Dha","Ni","Ṡa"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma","Pa","Dha","Ni"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re","Sa"]}
+  ]},
+  {name:"Sarali Varisai 9",subtitle:"Zig zag — focus on pmdp & mpgm",laya:"s r g m | p m | d p || s r g m | p d | n S || S n d p | m p | g m || S n d p | m g | r s",lines:[
+    {beats:["Sa","Re","Ga","Ma","Pa","Ma","Dha","Pa"]},
+    {beats:["Sa","Re","Ga","Ma","Pa","Dha","Ni","Ṡa"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma","Pa","Ga","Ma"]},
+    {beats:["Ṡa","Ni","Dha","Pa","Ma","Ga","Re","Sa"]}
+  ]},
+  {name:"Sarali Varisai 10",subtitle:"Focus on Pa (dheergam) and Ga as nyaasa swaram",laya:"s r g m | p , | g m || p , , , | p , | , , || g m p d | n d | p m || g m p–g | m g | r s",lines:[
+    {beats:["Sa","Re","Ga","Ma","Pa",",","Ga","Ma"]},
+    {beats:["Pa",",",",",",","Pa",",",",",","]},
+    {beats:["Ga","Ma","Pa","Dha","Ni","Dha","Pa","Ma"]},
+    {beats:["Ga","Ma","Pa","Ga","Ma","Ga","Re","Sa"]}
+  ]}
+];
+
+const ENCOURAGEMENTS=["Beautiful! You're finding your voice.","Every great musician started exactly here.","Your Sa is your home — always come back to it.","Feel the vibration, not just the pitch.","Trust your ears. They know more than you think."];
+function randomEnc(){return ENCOURAGEMENTS[Math.floor(Math.random()*ENCOURAGEMENTS.length)];}
+
+// ─── Audio Engine (Tanpura-style synthesis) ───
+class AudioEngine{
+  constructor(){this.ctx=null;this.droneNodes=[];this.currentTone=null;}
+  init(){if(!this.ctx)this.ctx=new(window.AudioContext||window.webkitAudioContext)();if(this.ctx.state==="suspended")this.ctx.resume();}
+  getFreq(b,s){return b*Math.pow(2,s/12);}
+  // Clean sine tone — plays for the full specified duration
+  playTone(f,d=6,v=0.25){
+    this.init();this.stopTone();
+    const o=this.ctx.createOscillator(),g=this.ctx.createGain();
+    o.type="sine";o.frequency.setValueAtTime(f,this.ctx.currentTime);
+    g.gain.setValueAtTime(0,this.ctx.currentTime);
+    g.gain.linearRampToValueAtTime(v,this.ctx.currentTime+0.05);
+    if(d>0.2){g.gain.setValueAtTime(v,this.ctx.currentTime+d-0.1);g.gain.linearRampToValueAtTime(0,this.ctx.currentTime+d);}
+    o.connect(g);g.connect(this.ctx.destination);o.start();
+    if(d>0)o.stop(this.ctx.currentTime+d);
+    this.currentTone={osc:o,gain:g};
+  }
+  stopTone(){if(this.currentTone){try{this.currentTone.gain.gain.cancelScheduledValues(this.ctx.currentTime);this.currentTone.gain.gain.linearRampToValueAtTime(0,this.ctx.currentTime+0.05);this.currentTone.osc.stop(this.ctx.currentTime+0.06);}catch(e){}this.currentTone=null;}}
+  // Drone: Sa + Pa, simple and gentle
+  startDrone(b){
+    this.init();this.stopDrone();
+    const mk=(f,v)=>{const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type="sine";o.frequency.setValueAtTime(f,this.ctx.currentTime);g.gain.setValueAtTime(0,this.ctx.currentTime);g.gain.linearRampToValueAtTime(v,this.ctx.currentTime+0.5);o.connect(g);g.connect(this.ctx.destination);o.start();return{osc:o,gain:g};};
+    this.droneNodes=[mk(b,0.06),mk(this.getFreq(b,7),0.04)];
+  }
+  stopDrone(){this.droneNodes.forEach(({osc:o,gain:g})=>{try{g.gain.cancelScheduledValues(this.ctx?.currentTime||0);g.gain.linearRampToValueAtTime(0,(this.ctx?.currentTime||0)+0.3);o.stop((this.ctx?.currentTime||0)+0.35);}catch(e){}});this.droneNodes=[];}
+  playShort(f,d=1,v=0.2){this.playTone(f,d,v);}
+  playClick(v=0.06){this.init();const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type="sine";o.frequency.setValueAtTime(880,this.ctx.currentTime);g.gain.setValueAtTime(v,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,this.ctx.currentTime+0.08);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+0.1);}
+  playSuccess(){this.init();const t=this.ctx.currentTime;[523.25,659.25,783.99].forEach((f,i)=>{const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type="sine";o.frequency.setValueAtTime(f,t+i*0.12);g.gain.setValueAtTime(0,t+i*0.12);g.gain.linearRampToValueAtTime(0.1,t+i*0.12+0.02);g.gain.linearRampToValueAtTime(0,t+i*0.12+0.25);o.connect(g);g.connect(this.ctx.destination);o.start(t+i*0.12);o.stop(t+i*0.12+0.3);});}
+  playBell(){this.init();const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type="sine";o.frequency.setValueAtTime(1200,this.ctx.currentTime);g.gain.setValueAtTime(0.12,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,this.ctx.currentTime+0.8);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+0.9);}
+}
+const audio=new AudioEngine();
+
+// ─── State ───
+const init={screen:"welcome",scale:null,baseFreq:null,raga:null,comfortLevel:null,exercisesCompleted:[],quizScores:[],saraliProgress:{},conversationHistory:[],amitHistory:[]};
+function reducer(s,a){
+  switch(a.type){
+    case "SET_SCREEN":return{...s,screen:a.payload};case "SET_SCALE":return{...s,scale:a.payload,baseFreq:BASE_FREQS[a.payload]};
+    case "SET_RAGA":return{...s,raga:a.payload};case "SET_COMFORT":return{...s,comfortLevel:a.payload};
+    case "ADD_EXERCISE":return{...s,exercisesCompleted:[...s.exercisesCompleted,a.payload]};
+    case "ADD_QUIZ_SCORE":return{...s,quizScores:[...s.quizScores,a.payload]};
+    case "SET_SARALI":return{...s,saraliProgress:{...s.saraliProgress,...a.payload}};
+    case "ADD_MSG":return{...s,conversationHistory:[...s.conversationHistory,a.payload]};
+    case "ADD_AMIT_MSG":return{...s,amitHistory:[...s.amitHistory,a.payload]};
+    case "GO_HOME":return{...s,screen:"hub"};
+    case "RESET":return{...init};default:return s;
+  }
+}
+
+// ─── TimerRing ───
+function TimerRing({progress,currentSwara,nextSwara,variantHint}){
+  const c=2*Math.PI*80,off=c*(1-progress);
+  return(<svg width="280" height="280" viewBox="0 0 300 300" style={{margin:"0 auto",display:"block"}}><defs><radialGradient id="gl"><stop offset="0%" stopColor="#D4A054" stopOpacity="0.12"/><stop offset="100%" stopColor="#D4A054" stopOpacity="0"/></radialGradient></defs><circle cx="150" cy="150" r="100" fill="url(#gl)"/><circle cx="150" cy="150" r="80" fill="none" stroke="rgba(212,160,84,0.1)" strokeWidth="5"/><circle cx="150" cy="150" r="80" fill="none" stroke="#D4A054" strokeWidth="5" strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" transform="rotate(-90 150 150)" style={{transition:"stroke-dashoffset 0.1s linear"}}/><text x="150" y="130" textAnchor="middle" dominantBaseline="central" fill="#F5E6C8" fontSize="52" fontFamily="'Cormorant Garamond',serif" fontWeight="700">{currentSwara}</text>{variantHint&&<text x="150" y="164" textAnchor="middle" fill="rgba(212,160,84,0.7)" fontSize="17" fontFamily="'DM Sans',sans-serif" fontWeight="500">{variantHint}</text>}<text x="150" y="185" textAnchor="middle" fill="rgba(212,160,84,0.45)" fontSize="12" fontFamily="'DM Sans',sans-serif">Sing this note</text>{nextSwara&&<text x="150" y="205" textAnchor="middle" fill="rgba(212,160,84,0.3)" fontSize="11" fontFamily="'DM Sans',sans-serif">Next: {nextSwara}</text>}</svg>);
+}
+
+// ─── ExerciseRunner (with pause/resume) ───
+function ExerciseRunner({sequence,baseFreq,onComplete,ragaSemitones,breakAfterIndex}){
+  const[idx,setIdx]=useState(0);const[progress,setProgress]=useState(0);const[running,setRunning]=useState(false);const[paused,setPaused]=useState(false);const[showBreak,setShowBreak]=useState(false);
+  const ivRef=useRef(null);const startRef=useRef(null);const elapsedRef=useRef(0);const cur=sequence[idx];
+  const begin=useCallback(()=>{audio.init();audio.startDrone(baseFreq);setRunning(true);setPaused(false);setIdx(0);setProgress(0);setShowBreak(false);elapsedRef.current=0;},[baseFreq]);
+
+  const pause=()=>{
+    clearInterval(ivRef.current);
+    elapsedRef.current=(Date.now()-startRef.current)/1000;
+    audio.stopTone();
+    setPaused(true);
+  };
+  const resume=()=>{
+    // Just unpause — the useEffect will handle restarting playback
+    setPaused(false);
+  };
+
+  useEffect(()=>{
+    if(!running||paused||showBreak)return;
+    const note=sequence[idx];
+    if(!note)return;
+    const st=ragaSemitones?(ragaSemitones[note.swara]??note.semitone):note.semitone;
+    const dur=note.dur||note.duration||6;
+    const alreadyElapsed=elapsedRef.current;
+    const remaining=dur-alreadyElapsed;
+    if(remaining<=0){
+      // Note already done, advance
+      elapsedRef.current=0;
+      if(idx<sequence.length-1){setIdx(i=>i+1);setProgress(0);}
+      else{audio.stopTone();audio.stopDrone();setRunning(false);setTimeout(()=>onComplete(),300);}
+      return;
+    }
+    audio.playTone(audio.getFreq(baseFreq,st),remaining,0.25);
+    startRef.current=Date.now()-alreadyElapsed*1000;
+    ivRef.current=setInterval(()=>{
+      const p=Math.min((Date.now()-startRef.current)/1000/dur,1);setProgress(p);
+      if(p>=1){
+        clearInterval(ivRef.current);elapsedRef.current=0;
+        if(breakAfterIndex!==undefined&&idx===breakAfterIndex){
+          audio.stopTone();audio.playBell();setShowBreak(true);
+          setTimeout(()=>{setShowBreak(false);
+            if(idx<sequence.length-1){setIdx(i=>i+1);setProgress(0);}
+            else{audio.stopTone();audio.stopDrone();setRunning(false);setTimeout(()=>onComplete(),300);}
+          },3000);
+        }else if(idx<sequence.length-1){setTimeout(()=>{setIdx(i=>i+1);setProgress(0);},600);}
+        else{audio.stopTone();audio.stopDrone();setRunning(false);setTimeout(()=>onComplete(),300);}
+      }
+    },50);
+    return()=>clearInterval(ivRef.current);
+  },[idx,running,paused,showBreak,sequence,baseFreq,ragaSemitones,onComplete,breakAfterIndex]);
+
+  const stop=()=>{clearInterval(ivRef.current);audio.stopTone();audio.stopDrone();setRunning(false);setPaused(false);setIdx(0);setProgress(0);setShowBreak(false);elapsedRef.current=0;};
+  if(showBreak)return(<div style={{textAlign:"center",padding:"40px 0",animation:"fadeIn 0.5s ease"}}><div style={{fontSize:28,marginBottom:8}}>🔔</div><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:22,color:"#D4A054",fontWeight:600}}>Arohanam Complete ✓</div><div style={{fontSize:13,color:"rgba(245,230,200,0.4)",marginTop:8}}>Now descending...</div></div>);
+  return(<div style={{textAlign:"center"}}>{!running?<button className="btn-primary" onClick={begin}>▶ Begin Practice</button>:(<>
+    <TimerRing progress={progress} currentSwara={cur.swara} nextSwara={idx<sequence.length-1?sequence[idx+1].swara:null} variantHint={ragaSemitones?variantLabel(cur.swara,ragaSemitones[cur.swara]):null}/>
+    <div style={{marginTop:8,color:"rgba(212,160,84,0.4)",fontSize:12}}>{idx+1} / {sequence.length}{paused?" · Paused":""}</div>
+    <div style={{marginTop:16,display:"flex",gap:10,justifyContent:"center"}}>
+      {paused?<button className="btn-primary" onClick={resume} style={{padding:"10px 24px"}}>▶ Resume</button>
+        :<button className="btn-secondary" onClick={pause} style={{padding:"10px 24px"}}>⏸ Pause</button>}
+      <button className="btn-ghost" onClick={stop}>⏹ Stop</button>
+    </div>
+  </>)}</div>);
+}
+
+// ─── MiniQuiz (identify only) ───
+function MiniQuiz({raga,baseFreq,onComplete}){
+  const rd=RAGAS[raga];const swaras=rd.arohanam.filter(s=>s!=="Ṡa");
+  const[round,setRound]=useState(0);const[score,setScore]=useState(0);const[played,setPlayed]=useState(false);
+  const[quizItems]=useState(()=>[...swaras,...swaras].sort(()=>Math.random()-0.5).slice(0,6).map(s=>({swara:s})));
+  const[feedback,setFeedback]=useState(null);const total=quizItems.length;const current=quizItems[round];
+  const playNote=()=>{audio.init();audio.playShort(audio.getFreq(baseFreq,rd.semitones[current.swara]),2,0.2);setPlayed(true);};
+  const answer=(ch)=>{if(feedback)return;const ok=ch===current.swara;
+    if(ok){setScore(s=>s+1);setFeedback({correct:true,msg:"✓ Correct!"});audio.playSuccess();}
+    else{audio.playTone(audio.getFreq(baseFreq,rd.semitones[current.swara]),2,0.18);setFeedback({correct:false,msg:`That was ${current.swara}, not ${ch}.`});}
+    setTimeout(()=>{setFeedback(null);setPlayed(false);if(round<total-1)setRound(r=>r+1);else onComplete(score+(ok?1:0),total);},2200);
+  };
+  if(!current)return null;
+  const opts=[current.swara,...[...swaras].filter(s=>s!==current.swara).sort(()=>Math.random()-0.5).slice(0,3)].sort(()=>Math.random()-0.5);
+  return(<div style={{textAlign:"center",maxWidth:400,margin:"0 auto"}}><div className="badge">Round {round+1}/{total}</div>
+    <div style={{marginTop:8,marginBottom:4,height:4,borderRadius:2,background:"rgba(255,255,255,0.06)",overflow:"hidden"}}><div style={{width:`${(round/total)*100}%`,height:"100%",background:"#D4A054",borderRadius:2,transition:"width 0.3s"}}/></div>
+    {feedback?(<div style={{padding:"32px 0",animation:"fadeIn 0.3s ease"}}><div style={{fontSize:28,marginBottom:8}}>{feedback.correct?"🎉":"🎵"}</div><div style={{fontSize:15,color:feedback.correct?"#4ADE80":"#FBBF24",lineHeight:1.6}}>{feedback.msg}</div></div>
+    ):(<div style={{padding:"24px 0"}}><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:18,color:"rgba(245,230,200,0.5)",marginBottom:16}}>Which swara is this?</div>
+      <button className="btn-secondary" onClick={playNote} style={{marginBottom:24}}>{played?"▶ Play again":"▶ Play note"}</button>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,maxWidth:280,margin:"0 auto"}}>{opts.map(o=><button key={o} onClick={()=>answer(o)} style={{background:"rgba(255,255,255,0.04)",border:"1.5px solid rgba(212,160,84,0.2)",borderRadius:12,padding:16,color:"#F5E6C8",fontSize:20,fontFamily:"'Cormorant Garamond',serif",fontWeight:600,cursor:"pointer"}}>{o}</button>)}</div>
+    </div>)}</div>);
+}
+
+// ─── SaraliPractice ───
+function SaraliPractice({lesson,baseFreq,ragaSemitones,onComplete}){
+  const[tempo,setTempo]=useState(60);const[playing,setPlaying]=useState(false);const[paused,setPaused]=useState(false);
+  const[lineIdx,setLineIdx]=useState(0);const[beatIdx,setBeatIdx]=useState(0);const[hasStarted,setHasStarted]=useState(false);
+  const[loopMode,setLoopMode]=useState(false);const[lineOnly,setLineOnly]=useState(null);const timerRef=useRef(null);
+  const semitones=ragaSemitones||RAGAS.shankarabharanam.semitones;const lines=lineOnly!==null?[lesson.lines[lineOnly]]:lesson.lines;
+  const start=()=>{audio.init();audio.startDrone(baseFreq);setPlaying(true);setPaused(false);setHasStarted(true);setLineIdx(0);setBeatIdx(0);};
+  const resume=()=>{audio.init();audio.startDrone(baseFreq);setPlaying(true);setPaused(false);};
+  const pause=()=>{setPlaying(false);setPaused(true);clearTimeout(timerRef.current);audio.stopTone();audio.stopDrone();};
+  const stop=()=>{setPlaying(false);setPaused(false);setHasStarted(false);clearTimeout(timerRef.current);audio.stopTone();audio.stopDrone();setLineIdx(0);setBeatIdx(0);};
+  useEffect(()=>{if(!playing)return;const ms=60000/tempo;const beat=lines[lineIdx]?.beats[beatIdx];if(!beat)return;
+    if(beat!==","&&beat!=="-"){
+      // Count how many consecutive commas follow this note to extend duration
+      let holdCount=0;const curLine=lines[lineIdx].beats;
+      for(let i=beatIdx+1;i<curLine.length;i++){if(curLine[i]===",")holdCount++;else break;}
+      // If commas continue into next lines, keep counting
+      if(beatIdx+1+holdCount>=curLine.length&&lineIdx<lines.length-1){
+        let nl=lineIdx+1;let ni=0;
+        while(nl<lines.length){
+          const nextBeat=lines[nl].beats[ni];
+          if(nextBeat===","){holdCount++;ni++;if(ni>=lines[nl].beats.length){nl++;ni=0;}}else break;
+        }
+      }
+      const totalDur=((1+holdCount)*ms)/1000;
+      const s=semitones[beat];if(s!==undefined)audio.playTone(audio.getFreq(baseFreq,s),totalDur,0.18);
+    }
+    audio.playClick(beat===","?0.015:0.05);
+    timerRef.current=setTimeout(()=>{if(beatIdx<lines[lineIdx].beats.length-1)setBeatIdx(b=>b+1);else if(lineIdx<lines.length-1){setLineIdx(l=>l+1);setBeatIdx(0);}else if(loopMode){setLineIdx(0);setBeatIdx(0);}else{stop();onComplete();}},ms);
+    return()=>clearTimeout(timerRef.current);
+  },[playing,lineIdx,beatIdx,tempo,lines,baseFreq,semitones,loopMode,onComplete]);
+  const totalBeats=lines.reduce((a,l)=>a+l.beats.length,0);
+  const doneBeats=lines.slice(0,lineIdx).reduce((a,l)=>a+l.beats.length,0)+beatIdx;
+  const progressPct=totalBeats>0?Math.round((doneBeats/totalBeats)*100):0;
+  return(<div style={{maxWidth:520,margin:"0 auto"}}>
+    <div style={{color:"rgba(245,230,200,0.35)",fontSize:12,textAlign:"center",marginBottom:20}}>{lesson.laya}</div>
+    <div style={{overflowX:"auto",marginBottom:20}}><table className="sarali-table"><thead><tr><td className="beat-header"></td>{[1,2,3,4,5,6,7,8].map(b=><td key={b} className="beat-header">{b}</td>)}</tr></thead><tbody>
+      {lesson.lines.map((line,li)=>(<tr key={li} style={{cursor:"pointer"}} onClick={()=>{if(!playing&&!paused)setLineOnly(lineOnly===li?null:li);}}>
+        <td className="label-cell" style={{background:lineOnly===li?"rgba(212,160,84,0.06)":"transparent"}}>{li+1}</td>
+        {line.beats.map((beat,bi)=>{const isAct=(playing||paused)&&((lineOnly!==null&&lineOnly===li)||(lineOnly===null))&&((lineOnly!==null?0:li)===lineIdx)&&bi===beatIdx;return <td key={bi} className={isAct?"active":beat===","?"rest":beat==="-"?"rest":""}>{beat===","?"—":beat}</td>;})}
+      </tr>))}</tbody></table></div>
+    {lineOnly!==null&&!playing&&!paused&&<div style={{textAlign:"center",marginBottom:12}}><span style={{fontSize:11,color:"rgba(212,160,84,0.5)"}}>Drilling: Line {lineOnly+1}</span><button className="btn-ghost" onClick={()=>setLineOnly(null)} style={{fontSize:11,padding:"4px 10px",marginLeft:8}}>Clear</button></div>}
+    <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:12,marginBottom:16,flexWrap:"wrap"}}>
+      <div style={{display:"flex",alignItems:"center",gap:6}}><span style={{fontSize:11,color:"rgba(245,230,200,0.4)"}}>Tempo:</span>{[40,60,80].map(t=><button key={t} onClick={()=>!playing&&setTempo(t)} className={`tempo-btn ${tempo===t?"active":""}`}>{t}</button>)}</div>
+      <button onClick={()=>setLoopMode(!loopMode)} className={`tempo-btn ${loopMode?"active":""}`}>🔁 Loop</button></div>
+    {(playing||paused)&&<div style={{textAlign:"center",marginBottom:16}}>
+      <div style={{display:"flex",justifyContent:"center",gap:6,alignItems:"center"}}>{[0,1,2,3,4,5,6,7].map(i=><div key={i} className={`metro-dot ${i===beatIdx?"active":""}`}/>)}</div>
+      <div style={{fontSize:11,color:"rgba(212,160,84,0.4)",marginTop:8}}>Beat {beatIdx+1} · Line {lineIdx+1}/{lines.length}{paused?" · Paused":""}</div>
+      {paused&&<div style={{fontSize:12,color:"#FBBF24",marginTop:6}}>{progressPct}% complete</div>}
+    </div>}
+    <div style={{textAlign:"center",marginTop:8,display:"flex",gap:10,justifyContent:"center"}}>
+      {!hasStarted&&<button className="btn-primary" onClick={start}>▶ Begin</button>}
+      {playing&&<><button className="btn-secondary" onClick={pause}>⏸ Pause</button><button className="btn-ghost" onClick={stop}>⏹ Stop</button></>}
+      {paused&&<><button className="btn-primary" onClick={resume}>▶ Resume</button><button className="btn-ghost" onClick={stop}>⏹ Start Over</button></>}
+    </div>
+  </div>);
+}
+
+// ─── Amit Mode (AI Guru — Adaptive + Story-driven) ───
+function AmitMode({state,dispatch}){
+  const[input,setInput]=useState("");const[loading,setLoading]=useState(false);const[playingPhrase,setPlayingPhrase]=useState(null);
+  const endRef=useRef(null);const msgs=state.amitHistory;
+  useEffect(()=>{endRef.current?.scrollIntoView({behavior:"smooth"});},[msgs]);
+
+  // Parse [PLAY:Sa,Re,Ga] commands from guru response
+  const parsePlayCommands=(text)=>{
+    const parts=[];let last=0;
+    const rx=/\[PLAY:([^\]]+)\]/g;let m;
+    while((m=rx.exec(text))!==null){
+      if(m.index>last)parts.push({type:"text",content:text.slice(last,m.index)});
+      const swaras=m[1].split(",").map(s=>s.trim());
+      parts.push({type:"play",swaras});
+      last=m.index+m[0].length;
+    }
+    if(last<text.length)parts.push({type:"text",content:text.slice(last)});
+    return parts;
+  };
+
+  const playSwaras=(swaraNames)=>{
+    const raga=state.raga?RAGAS[state.raga]:RAGAS.shankarabharanam;
+    audio.init();
+    setPlayingPhrase(swaraNames.join(" "));
+    let i=0;
+    const playNext=()=>{
+      if(i>=swaraNames.length){setPlayingPhrase(null);return;}
+      const s=swaraNames[i];const semi=raga.semitones[s];
+      if(semi!==undefined)audio.playTone(audio.getFreq(state.baseFreq,semi),0.9,0.2);
+      i++;setTimeout(playNext,1000);
+    };
+    playNext();
+  };
+
+  const send=async(text)=>{
+    const msg=text||input.trim();if(!msg||loading)return;
+    dispatch({type:"ADD_AMIT_MSG",payload:{role:"user",content:msg}});setInput("");setLoading(true);
+
+    const ragaInfo=Object.entries(RAGAS).map(([k,r])=>`${r.name}: ${r.arohanam.join(" ")} (semitones: ${JSON.stringify(r.semitones)})`).join("\n");
+
+    const sys=`You are Amit, a warm, deeply knowledgeable Carnatic music guru inside the AMITAI app. You teach through stories, feeling, and guided phrase-by-phrase practice.
+
+STUDENT CONTEXT:
+- Sa = ${state.scale} (${state.baseFreq}Hz)
+- Current raga: ${state.raga?RAGAS[state.raga].name:"none selected"}
+- Exercises completed: ${state.exercisesCompleted.join(", ")||"none"}
+- Quiz scores: ${state.quizScores.map(q=>`${q.score}/${q.total}`).join(", ")||"none"}
+- Comfort level: ${state.comfortLevel||"unknown"}
+
+AVAILABLE RAGAS:
+${ragaInfo}
+
+YOUR TEACHING STYLE:
+- Start sessions by understanding what the student wants, or recommend based on their history
+- Introduce ragas through their emotional character, time of day, famous compositions — not just theory
+- Teach phrase by phrase: start with 2-3 swara fragments that define the raga's personality (pakads)
+- Use [PLAY:Sa,Re,Ga] syntax to play swaras through the tanpura — the app will render these as playable audio buttons
+- Example: "The heart of Mohanam lives in this descent: [PLAY:Ga,Re,Sa]. Feel how it resolves gently to Sa."
+- Progressively build longer phrases, connecting them into the full arohanam/avarohanam
+- Draw connections between ragas the student already knows
+- Be encouraging, patient, and concise (3-6 sentences per response, with 1-2 [PLAY] commands when teaching)
+- If the student seems confused, simplify. If confident, challenge them.
+- You can suggest they try Raga Practice, Quiz Mode, or Varisai Practice from the main menu if appropriate.
+
+Always use swara names (Sa Re Ga Ma Pa Dha Ni) not Western note names.`;
+
+    const apiMsgs=[...msgs.map(m=>({role:m.role,content:m.content})),{role:"user",content:msg}];
+    try{
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:sys,messages:apiMsgs})});
+      const data=await res.json();const text=data.content?.map(b=>b.text||"").join("")||"I'm having trouble connecting. Let's try again.";
+      dispatch({type:"ADD_AMIT_MSG",payload:{role:"assistant",content:text}});
+    }catch(e){dispatch({type:"ADD_AMIT_MSG",payload:{role:"assistant",content:"Couldn't reach my thoughts right now. Please try again."}});}
+    setLoading(false);
+  };
+
+  const renderMessage=(m,i)=>{
+    if(m.role==="user")return <div key={i} className="amit-bubble user">{m.content}</div>;
+    const parts=parsePlayCommands(m.content);
+    return(<div key={i} className="amit-bubble guru">
+      {parts.map((p,j)=>p.type==="text"?<span key={j} style={{whiteSpace:"pre-wrap"}}>{p.content}</span>:(
+        <button key={j} className="play-btn" onClick={()=>playSwaras(p.swaras)}>
+          ▶ {p.swaras.join(" · ")}
+        </button>
+      ))}
+    </div>);
+  };
+
+  return(
+    <div className="amit-chat">
+      <div style={{padding:"16px 20px",borderBottom:"1px solid rgba(212,160,84,0.1)",display:"flex",alignItems:"center",gap:10}}>
+        <div style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#D4A054,#8B5E3C)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🙏</div>
+        <div><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:17,fontWeight:600,color:"#D4A054"}}>Amit Mode</div>
+        <div style={{fontSize:10,color:"rgba(245,230,200,0.35)"}}>Your AI Carnatic guru · Adaptive & story-driven</div></div>
+      </div>
+      <div className="amit-msgs">
+        {msgs.length===0&&(
+          <div style={{textAlign:"center",padding:"40px 16px",animation:"fadeIn 0.5s ease"}}>
+            <div style={{fontSize:36,marginBottom:12}}>🪷</div>
+            <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:20,color:"#D4A054",marginBottom:8}}>Namaste</div>
+            <div style={{fontSize:13,color:"rgba(245,230,200,0.4)",lineHeight:1.7,maxWidth:320,margin:"0 auto"}}>
+              I'm Amit, your Carnatic music guru. Tell me what you'd like to explore — a new raga, a phrase that's been stuck in your head, or just say "teach me something beautiful."
+            </div>
+            <div style={{display:"flex",gap:8,justifyContent:"center",marginTop:20,flexWrap:"wrap"}}>
+              {["Teach me a new raga","I want to explore Mohanam","What raga matches my mood?","Help me understand gamakas"].map(s=>(
+                <button key={s} onClick={()=>send(s)} style={{background:"rgba(212,160,84,0.08)",border:"1px solid rgba(212,160,84,0.2)",borderRadius:10,padding:"8px 14px",color:"#D4A054",fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>{s}</button>
+              ))}
+            </div>
+          </div>
+        )}
+        {msgs.map(renderMessage)}
+        {loading&&<div style={{alignSelf:"flex-start",color:"rgba(212,160,84,0.4)",fontSize:13,padding:"8px 16px",animation:"pulse 1.5s infinite"}}>Amit is thinking...</div>}
+        {playingPhrase&&<div style={{textAlign:"center",fontSize:12,color:"#D4A054",padding:8,animation:"pulse 1s infinite"}}>♪ Playing: {playingPhrase}</div>}
+        <div ref={endRef}/>
+      </div>
+      <div className="amit-input">
+        <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Talk to your guru..."/>
+        <button onClick={()=>send()} disabled={loading} style={{opacity:loading?0.5:1}}>→</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Screens ───
+function WelcomeScreen({dispatch}){
+  return(<div className="screen">
+    <div style={{fontSize:14,letterSpacing:4,color:"rgba(212,160,84,0.4)",textTransform:"uppercase",marginBottom:12}}>Welcome to</div>
+    <h1 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:52,fontWeight:700,color:"#F5E6C8",marginBottom:4,letterSpacing:2}}>AMITAI</h1>
+    <svg width="64" height="64" viewBox="0 0 64 64" style={{marginBottom:10}}><rect x="12" y="2" width="40" height="22" rx="6" fill="#3E2A1C"/><rect x="14" y="16" width="36" height="40" rx="4" fill="#C4956A"/><rect x="18" y="28" width="10" height="3" rx="1.5" fill="#2A1A10"/><rect x="36" y="28" width="10" height="3" rx="1.5" fill="#2A1A10"/><rect x="17" y="33" width="12" height="10" rx="1.5" fill="none" stroke="#111" strokeWidth="2.5"/><rect x="35" y="33" width="12" height="10" rx="1.5" fill="none" stroke="#111" strokeWidth="2.5"/><line x1="29" y1="38" x2="35" y2="38" stroke="#111" strokeWidth="2"/><line x1="17" y1="37" x2="13" y2="36" stroke="#111" strokeWidth="1.5"/><line x1="47" y1="37" x2="51" y2="36" stroke="#111" strokeWidth="1.5"/><circle cx="23" cy="38" r="1.8" fill="#111"/><circle cx="41" cy="38" r="1.8" fill="#111"/><line x1="32" y1="41" x2="32" y2="46" stroke="#A07850" strokeWidth="1.2" strokeLinecap="round"/><line x1="27" y1="50" x2="37" y2="50" stroke="#7A5535" strokeWidth="1.5" strokeLinecap="round"/></svg>
+    <p style={{fontSize:14.5,color:"rgba(212,160,84,0.55)",marginBottom:8}}>Your personal Carnatic music teacher</p>
+    <div style={{width:60,height:1,background:"rgba(212,160,84,0.2)",margin:"16px auto 24px"}}/>
+    <p className="subtext" style={{marginBottom:36}}>Learn the seven swaras — Sa Re Ga Ma Pa Dha Ni — through tanpura-guided practice, ear training, and an AI guru. No experience needed.</p>
+    <button className="btn-primary" onClick={()=>dispatch({type:"SET_SCREEN",payload:"scaleSelect"})}>Begin Your Journey</button>
+  </div>);
+}
+
+function ScaleSelectScreen({dispatch}){
+  return(<div className="screen"><h2 className="heading">Find Your Shruti</h2>
+    <p className="subtext" style={{marginBottom:28}}>Your shruti (base pitch) sets Sa — your home note. Hover to hear, click to select.</p>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:11,maxWidth:320}}>
+      {SCALES.map(s=><button key={s} className="scale-btn" onMouseEnter={()=>{audio.init();audio.playShort(BASE_FREQS[s],1,0.15);}}
+        onClick={()=>{dispatch({type:"SET_SCALE",payload:s});dispatch({type:"SET_SCREEN",payload:"saPaSa"});}}>{s}</button>)}
+    </div><div style={{marginTop:12,fontSize:11,color:"rgba(245,230,200,0.25)"}}>Recommended: <b className="gold">C</b> or <b className="gold">D</b></div></div>);
+}
+
+function SaPaSaScreen({state,dispatch}){
+  const onDone=useCallback(()=>{dispatch({type:"ADD_EXERCISE",payload:"Sa-Pa-Sa"});dispatch({type:"SET_SCREEN",payload:"checkin1"});},[dispatch]);
+  return(<div className="screen"><div className="badge">Shruti = {state.scale}</div><h2 className="heading">Sa · Pa · Ṡa · Pa · Sa</h2>
+    <p className="subtext" style={{marginBottom:24}}>The foundational warm-up. Listen and sing along with the tanpura.</p>
+    <ExerciseRunner sequence={SA_PA_SA} baseFreq={state.baseFreq} onComplete={onDone} breakAfterIndex={2}/></div>);
+}
+
+function CheckIn1Screen({dispatch}){
+  const choose=(l)=>{dispatch({type:"SET_COMFORT",payload:l});dispatch({type:"SET_SCREEN",payload:l==="difficult"?"saPaSa":"hub"});};
+  return(<div className="screen"><div style={{fontSize:32,marginBottom:10}}>✨</div><h2 className="heading">How did that feel?</h2>
+    <p className="subtext" style={{marginBottom:28}}>{randomEnc()}</p>
+    <div style={{display:"flex",gap:12,flexWrap:"wrap",justifyContent:"center"}}>
+      {[{l:"easy",t:"Easy!",d:"Ready for more"},{l:"okay",t:"Okay",d:"Getting there"},{l:"difficult",t:"Difficult",d:"Let me try again"}].map(({l,t,d})=>(
+        <button key={l} className="btn-choice" style={{minWidth:100,maxWidth:140}} onClick={()=>choose(l)}>
+          <div style={{fontSize:16,fontFamily:"'Cormorant Garamond',serif",fontWeight:600}}>{t}</div>
+          <div style={{fontSize:11,color:"rgba(245,230,200,0.35)",marginTop:3}}>{d}</div>
+        </button>
+      ))}
+    </div></div>);
+}
+
+// ─── HUB ───
+function HubScreen({state,dispatch}){
+  const needsRaga=(target)=>{
+    if(!state.raga){dispatch({type:"SET_SCREEN",payload:"ragaPick_"+target});return;}
+    dispatch({type:"SET_SCREEN",payload:target});
+  };
+  return(<div className="screen">
+    <h2 className="heading">What would you like to practice?</h2>
+    <p className="subtext">Choose a path. You can always come back here.</p>
+    <div style={{display:"flex",flexDirection:"column",gap:14,width:"100%",maxWidth:420}}>
+      <div className="hub-card" onClick={()=>dispatch({type:"SET_SCREEN",payload:"ragaSelect"})}>
+        <div className="hub-icon">🎵</div>
+        <div className="hub-title">Raga Practice</div>
+        <div className="hub-desc">Select a ragam and practice its arohanam & avarohanam with tanpura reference tones.</div>
+      </div>
+      <div className="hub-card" onClick={()=>needsRaga("quizSetup")}>
+        <div className="hub-icon">🧠</div>
+        <div className="hub-title">Quiz Mode</div>
+        <div className="hub-desc">Test your ear — listen to a swara and identify it. Builds your swara recognition.</div>
+      </div>
+      <div className="hub-card" onClick={()=>needsRaga("varisaiMenu")}>
+        <div className="hub-icon">📿</div>
+        <div className="hub-title">Varisai Practice</div>
+        <div className="hub-desc">Sarali Varisai — structured rhythmic patterns for building vocal foundations.</div>
+      </div>
+      <div className="hub-card amit" onClick={()=>dispatch({type:"SET_SCREEN",payload:"amitMode"})}>
+        <div className="hub-icon">🪷</div>
+        <div className="hub-title">Amit Mode <span style={{fontSize:10,color:"rgba(212,160,84,0.6)",fontFamily:"'DM Sans',sans-serif",fontWeight:400,marginLeft:6}}>✨ experimental</span></div>
+        <div className="hub-desc">AI-guided exploration — your personal guru teaches ragas through stories, phrases, and adaptive practice.</div>
+      </div>
+    </div>
+  </div>);
+}
+
+// ─── Raga Picker (intercept for quiz/varisai when no raga selected) ───
+function RagaPickerScreen({state,dispatch,target}){
+  const preview=(k)=>{const r=RAGAS[k];audio.init();let i=0;const p=()=>{if(i<r.arohanam.length){audio.playShort(audio.getFreq(state.baseFreq,r.semitones[r.arohanam[i]]),0.9,0.18);i++;setTimeout(p,1000);}};p();};
+  return(<div className="screen">
+    <div className="badge">Select a Base Raga</div>
+    <h2 className="heading">Choose a raga first</h2>
+    <p className="subtext" style={{marginBottom:24}}>This sets the swara intervals for your practice. You can change it anytime from Raga Practice.</p>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:480,width:"100%"}}>
+      {Object.entries(RAGAS).map(([k,r])=>(
+        <div key={k} className="raga-card" onClick={()=>{dispatch({type:"SET_RAGA",payload:k});dispatch({type:"SET_SCREEN",payload:target});}}>
+          <div style={{fontSize:16,fontFamily:"'Cormorant Garamond',serif",fontWeight:600,color:"#F5E6C8",marginBottom:5}}>{r.name}</div>
+          <div style={{fontSize:11,color:"rgba(212,160,84,0.5)"}}>↑ {r.arohanam.join(" · ")}</div>
+          <button onClick={e=>{e.stopPropagation();preview(k);}} style={{marginTop:8,background:"rgba(212,160,84,0.08)",border:"1px solid rgba(212,160,84,0.15)",borderRadius:7,padding:"4px 10px",color:"#D4A054",fontSize:11,cursor:"pointer"}}>▶ Preview</button>
+        </div>))}
+    </div>
+  </div>);
+}
+
+// ─── Raga Practice flow ───
+function RagaSelectScreen({state,dispatch}){
+  const rec=state.comfortLevel==="easy"?"mayamalavagowla":"mohanam";
+  const preview=(k)=>{const r=RAGAS[k];audio.init();let i=0;const p=()=>{if(i<r.arohanam.length){audio.playShort(audio.getFreq(state.baseFreq,r.semitones[r.arohanam[i]]),0.9,0.18);i++;setTimeout(p,1000);}};p();};
+  return(<div className="screen"><div className="badge">Raga Practice</div><h2 className="heading">Choose a Raga</h2>
+    <p className="subtext" style={{marginBottom:24}}>We recommend <b className="gold">{RAGAS[rec].name}</b> based on your level.</p>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,maxWidth:480,width:"100%"}}>
+      {Object.entries(RAGAS).map(([k,r])=>(
+        <div key={k} className={`raga-card ${k===rec?"recommended":""}`} onClick={()=>{dispatch({type:"SET_RAGA",payload:k});dispatch({type:"SET_SCREEN",payload:"ragaPractice"});}}>
+          {k===rec&&<div className="rec-tag">Recommended</div>}
+          <div style={{fontSize:16,fontFamily:"'Cormorant Garamond',serif",fontWeight:600,color:"#F5E6C8",marginBottom:5}}>{r.name}</div>
+          <div style={{fontSize:11.5,color:"rgba(245,230,200,0.4)",lineHeight:1.4,marginBottom:6}}>{r.description}</div>
+          <div style={{fontSize:11,color:"rgba(212,160,84,0.5)"}}>↑ {r.arohanam.join(" · ")}</div>
+          <div style={{fontSize:12.5,color:"rgba(212,160,84,0.5)",marginTop:3,fontStyle:"italic",letterSpacing:0.5}}>{r.variants}</div>
+          <button onClick={e=>{e.stopPropagation();preview(k);}} style={{marginTop:8,background:"rgba(212,160,84,0.08)",border:"1px solid rgba(212,160,84,0.15)",borderRadius:7,padding:"4px 10px",color:"#D4A054",fontSize:11,cursor:"pointer"}}>▶ Preview</button>
+        </div>))}
+    </div></div>);
+}
+
+function RagaPracticeScreen({state,dispatch}){
+  const r=RAGAS[state.raga];const full=[...r.arohanam.map(s=>({swara:s,semitone:r.semitones[s],dur:5})),...r.avarohanam.map(s=>({swara:s,semitone:r.semitones[s],dur:5}))];
+  const onDone=useCallback(()=>{dispatch({type:"ADD_EXERCISE",payload:`${r.name} scale`});dispatch({type:"SET_SCREEN",payload:"ragaDone"});},[dispatch,r.name]);
+  return(<div className="screen"><div className="badge">{r.name}</div><h2 className="heading">{r.name} Scale</h2>
+    <div style={{fontSize:13,color:"rgba(245,230,200,0.45)",maxWidth:440,textAlign:"center",lineHeight:1.6,marginBottom:12}}>{r.mood}</div>
+    <div style={{fontSize:12,color:"rgba(212,160,84,0.45)",maxWidth:420,textAlign:"center",lineHeight:1.5,marginBottom:16}}>♪ {r.compositions}</div>
+    <div style={{fontSize:12,color:"rgba(245,230,200,0.3)",marginBottom:4}}>↑ {r.arohanam.join(" · ")}</div>
+    <div style={{fontSize:12,color:"rgba(245,230,200,0.3)",marginBottom:4}}>↓ {r.avarohanam.join(" · ")}</div>
+    <div style={{fontSize:14,color:"rgba(212,160,84,0.55)",marginBottom:20,fontStyle:"italic",letterSpacing:0.5}}>Positions: {r.variants}</div>
+    <ExerciseRunner sequence={full} baseFreq={state.baseFreq} onComplete={onDone} ragaSemitones={r.semitones} breakAfterIndex={r.arohanam.length-1}/></div>);
+}
+
+function RagaDoneScreen({state,dispatch}){
+  return(<div className="screen"><div style={{fontSize:36,marginBottom:10}}>✨</div><h2 className="heading">Well done!</h2>
+    <p className="subtext" style={{marginBottom:24}}>{randomEnc()}</p>
+    <div style={{display:"flex",flexDirection:"column",gap:10,width:"100%",maxWidth:300}}>
+      <button className="btn-choice" onClick={()=>dispatch({type:"SET_SCREEN",payload:"ragaPractice"})}>Practice again</button>
+      <button className="btn-choice" onClick={()=>dispatch({type:"SET_SCREEN",payload:"ragaSelect"})}>Try another raga</button>
+      <button className="btn-primary" onClick={()=>dispatch({type:"SET_SCREEN",payload:"hub"})} style={{marginTop:8}}>← Back to Home</button>
+    </div></div>);
+}
+
+// ─── Quiz flow ───
+function QuizSetupScreen({state,dispatch}){
+  return(<div className="screen"><div className="badge">Quiz Mode</div><h2 className="heading">Ear Training Quiz</h2>
+    <p className="subtext" style={{marginBottom:24}}>Choose a raga to be quizzed on.</p>
+    <div style={{display:"flex",flexDirection:"column",gap:10,width:"100%",maxWidth:360}}>
+      {Object.entries(RAGAS).map(([k,r])=>(
+        <button key={k} className="btn-choice" onClick={()=>{dispatch({type:"SET_RAGA",payload:k});dispatch({type:"SET_SCREEN",payload:"quiz"});}}>
+          <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:16,fontWeight:600}}>{r.name}</div>
+          <div style={{fontSize:11,color:"rgba(212,160,84,0.5)",marginTop:2}}>{r.arohanam.join(" · ")}</div>
+          <div style={{fontSize:12.5,color:"rgba(212,160,84,0.5)",marginTop:2,fontStyle:"italic",letterSpacing:0.5}}>{r.variants}</div>
+        </button>
+      ))}
+    </div></div>);
+}
+
+function QuizScreen({state,dispatch}){
+  const onDone=(sc,tot)=>{dispatch({type:"ADD_QUIZ_SCORE",payload:{score:sc,total:tot,raga:state.raga}});dispatch({type:"ADD_EXERCISE",payload:`Quiz: ${sc}/${tot}`});dispatch({type:"SET_SCREEN",payload:"quizResults"});};
+  return(<div className="screen"><div className="badge">Quiz Mode · {RAGAS[state.raga].name}</div><h2 className="heading">Identify the Swara</h2>
+    <MiniQuiz raga={state.raga} baseFreq={state.baseFreq} onComplete={onDone}/></div>);
+}
+
+function QuizResultsScreen({state,dispatch}){
+  const last=state.quizScores[state.quizScores.length-1];const pct=last?(last.score/last.total)*100:0;
+  return(<div className="screen"><div style={{fontSize:36,marginBottom:10}}>{pct>=90?"🌟":pct>=60?"🎵":"💪"}</div>
+    <h2 className="heading">{last?`${last.score}/${last.total}`:""} Correct</h2>
+    <p className="subtext" style={{marginBottom:24}}>{pct>=90?"Your ear is sharp!":pct>=60?"Getting there — keep listening!":"Let's practice the scale more."}</p>
+    <div style={{display:"flex",flexDirection:"column",gap:10,width:"100%",maxWidth:300}}>
+      <button className="btn-choice" onClick={()=>dispatch({type:"SET_SCREEN",payload:"quiz"})}>Retake quiz</button>
+      <button className="btn-choice" onClick={()=>dispatch({type:"SET_SCREEN",payload:"quizSetup"})}>Try another raga</button>
+      <button className="btn-primary" onClick={()=>dispatch({type:"SET_SCREEN",payload:"hub"})} style={{marginTop:8}}>← Back to Home</button>
+    </div></div>);
+}
+
+// ─── Varisai flow ───
+function VarisaiMenuScreen({state,dispatch}){
+  return(<div className="screen"><div className="badge">Varisai Practice</div><h2 className="heading">Sarali Varisai</h2>
+    <p className="subtext" style={{marginBottom:4}}>Easy sequences for building vocal foundations.</p>
+    <p className="subtext" style={{fontSize:12,marginBottom:24}}>Click a row during practice to drill just that line.</p>
+    <div style={{display:"flex",flexDirection:"column",gap:10,width:"100%",maxWidth:440}}>
+      {SARALI.map((ex,i)=>(
+        <div key={i} className="hub-card" style={{padding:"14px 16px"}} onClick={()=>{dispatch({type:"SET_SARALI",payload:{currentEx:i}});dispatch({type:"SET_SCREEN",payload:"saraliPractice"});}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div className="hub-title" style={{fontSize:16}}>{ex.name}</div>
+            {state.saraliProgress[`ex${i}`]&&<span style={{fontSize:11,color:"#4ADE80"}}>✓</span>}
+          </div>
+          <div style={{fontSize:12,color:"rgba(245,230,200,0.4)",marginTop:2}}>{ex.subtitle}</div>
+        </div>
+      ))}
+    </div></div>);
+}
+
+function SaraliPracticeScreen({state,dispatch}){
+  const exIdx=state.saraliProgress.currentEx||0;const ex=SARALI[exIdx];
+  const sem=state.raga?RAGAS[state.raga].semitones:RAGAS.shankarabharanam.semitones;
+  const ragaName=state.raga?RAGAS[state.raga].name:"Shankarabharanam";
+  const onDone=useCallback(()=>{
+    dispatch({type:"SET_SARALI",payload:{[`ex${exIdx}`]:true}});
+    dispatch({type:"ADD_EXERCISE",payload:`Sarali ${exIdx+1}`});
+    dispatch({type:"SET_SCREEN",payload:"varisaiDone"});
+  },[dispatch,exIdx]);
+  if(!ex)return null;
+  return(<div className="screen"><div className="badge">Sarali Varisai · {ragaName}</div>
+    <h2 className="heading">{ex.name}</h2>
+    <div style={{fontSize:12,color:"rgba(245,230,200,0.4)",marginBottom:16}}>{ex.subtitle}</div>
+    <SaraliPractice lesson={ex} baseFreq={state.baseFreq} ragaSemitones={sem} onComplete={onDone}/></div>);
+}
+
+function VarisaiDoneScreen({state,dispatch}){
+  const exIdx=state.saraliProgress.currentEx||0;const hasNext=exIdx<SARALI.length-1;
+  return(<div className="screen"><div style={{fontSize:36,marginBottom:10}}>🎶</div><h2 className="heading">Wonderful Practice!</h2>
+    <p className="subtext" style={{marginBottom:24}}>Your foundations are growing stronger.</p>
+    <div style={{display:"flex",flexDirection:"column",gap:10,width:"100%",maxWidth:300}}>
+      {hasNext&&<button className="btn-choice" onClick={()=>{dispatch({type:"SET_SARALI",payload:{currentEx:exIdx+1}});dispatch({type:"SET_SCREEN",payload:"saraliPractice"});}}>Next: {SARALI[exIdx+1].name}</button>}
+      <button className="btn-choice" onClick={()=>dispatch({type:"SET_SCREEN",payload:"varisaiMenu"})}>All exercises</button>
+      <button className="btn-primary" onClick={()=>dispatch({type:"SET_SCREEN",payload:"hub"})} style={{marginTop:8}}>← Back to Home</button>
+    </div></div>);
+}
+
+// ─── Amit Mode Screen ───
+function AmitModeScreen({state,dispatch}){
+  return(<div className="screen" style={{maxWidth:640}}>
+    <div style={{width:"100%",background:"rgba(255,255,255,0.02)",border:"1px solid rgba(212,160,84,0.1)",borderRadius:18,overflow:"hidden",minHeight:500}}>
+      <AmitMode state={state} dispatch={dispatch}/>
+    </div>
+  </div>);
+}
+
+// ─── Main App ───
+function App(){
+  const[state,dispatch]=useReducer(reducer,init);
+  useEffect(()=>()=>{audio.stopTone();audio.stopDrone();},[]);
+
+  const goHome=()=>{audio.stopTone();audio.stopDrone();dispatch({type:"GO_HOME"});};
+
+  const screenMap={
+    welcome:<WelcomeScreen dispatch={dispatch}/>,scaleSelect:<ScaleSelectScreen dispatch={dispatch}/>,
+    saPaSa:<SaPaSaScreen state={state} dispatch={dispatch}/>,checkin1:<CheckIn1Screen dispatch={dispatch}/>,
+    hub:<HubScreen state={state} dispatch={dispatch}/>,
+    "ragaPick_quizSetup":<RagaPickerScreen state={state} dispatch={dispatch} target="quizSetup"/>,
+    "ragaPick_varisaiMenu":<RagaPickerScreen state={state} dispatch={dispatch} target="varisaiMenu"/>,
+    ragaSelect:<RagaSelectScreen state={state} dispatch={dispatch}/>,ragaPractice:<RagaPracticeScreen state={state} dispatch={dispatch}/>,ragaDone:<RagaDoneScreen state={state} dispatch={dispatch}/>,
+    quizSetup:<QuizSetupScreen state={state} dispatch={dispatch}/>,quiz:<QuizScreen state={state} dispatch={dispatch}/>,quizResults:<QuizResultsScreen state={state} dispatch={dispatch}/>,
+    varisaiMenu:<VarisaiMenuScreen state={state} dispatch={dispatch}/>,saraliPractice:<SaraliPracticeScreen state={state} dispatch={dispatch}/>,varisaiDone:<VarisaiDoneScreen state={state} dispatch={dispatch}/>,
+    amitMode:<AmitModeScreen state={state} dispatch={dispatch}/>
+  };
+
+  const showHome=state.screen!=="welcome"&&state.screen!=="scaleSelect"&&state.screen!=="hub";
+  const showStartOver=state.screen!=="welcome"&&state.screen!=="scaleSelect";
+
+  return(
+    <div style={{minHeight:"100vh",background:"radial-gradient(ellipse at 50% 15%,#1A0F0A 0%,#0D0805 70%)",color:"#F5E6C8",position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",top:-200,left:"50%",transform:"translateX(-50%)",width:600,height:600,borderRadius:"50%",background:"radial-gradient(circle,rgba(212,160,84,0.03) 0%,transparent 70%)",pointerEvents:"none"}}/>
+      {state.screen!=="welcome"&&(
+        <div className="header">
+          <div className="header-logo" onClick={goHome}>AMITAI</div>
+          <div className="header-info">
+            {state.scale&&<span>Shruti: {state.scale}</span>}
+            {state.raga&&state.screen!=="hub"&&state.screen!=="ragaSelect"&&state.screen!=="quizSetup"&&!state.screen.startsWith("ragaPick")&&<span style={{color:"rgba(212,160,84,0.45)"}}>{RAGAS[state.raga]?.name}</span>}
+            {showHome&&<button className="btn-ghost" style={{fontSize:10,padding:"4px 10px"}} onClick={goHome}>🏠 Home</button>}
+            {showStartOver&&<button className="btn-ghost" style={{fontSize:10,padding:"4px 10px",color:"rgba(245,230,200,0.25)"}} onClick={()=>{audio.stopTone();audio.stopDrone();dispatch({type:"RESET"});}}>↺ Start Over</button>}
+          </div>
+        </div>
+      )}
+      <div style={{display:"flex",justifyContent:"center",alignItems:"center",
+        minHeight:state.screen==="welcome"?"100vh":"calc(100vh - 52px)",
+        padding:state.screen==="amitMode"?"20px 16px":"40px 20px",
+        animation:"fadeIn 0.4s ease"}} key={state.screen}>
+        {screenMap[state.screen]||<WelcomeScreen dispatch={dispatch}/>}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

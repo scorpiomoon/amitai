@@ -1,0 +1,22 @@
+{
+  "name": "AMITAI — Carnatic Music Teacher",
+  "short_name": "AMITAI",
+  "description": "Your personal Carnatic music teacher. Learn swaras through guided practice, ear training, and an AI guru.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D0805",
+  "theme_color": "#D4A054",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
