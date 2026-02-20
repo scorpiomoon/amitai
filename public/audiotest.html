@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audio Test</title>
+<style>
+  body{background:#0D0805;color:#F5E6C8;font-family:sans-serif;padding:40px 20px;text-align:center;}
+  button{background:#D4A054;color:#0D0805;border:none;padding:16px 32px;border-radius:12px;font-size:18px;margin:12px;cursor:pointer;}
+  #log{text-align:left;font-size:13px;margin-top:30px;padding:16px;background:rgba(255,255,255,0.05);border-radius:8px;white-space:pre-wrap;max-height:400px;overflow-y:auto;}
+</style></head><body>
+<h2>Mobile Audio Test</h2>
+<p>Tap each button and report what happens</p>
+
+<button id="btn1">Test 1: Basic Oscillator</button><br>
+<button id="btn2">Test 2: With Resume</button><br>
+<button id="btn3">Test 3: Silent Buffer + Tone</button><br>
+<button id="btn4">Test 4: Delayed Tone</button><br>
+
+<div id="log"></div>
+
+<script>
+const log = document.getElementById('log');
+function L(msg) { log.textContent += new Date().toLocaleTimeString() + ' | ' + msg + '\n'; log.scrollTop = log.scrollHeight; }
+
+let ctx = null;
+
+document.getElementById('btn1').onclick = function() {
+  L('--- Test 1: Basic ---');
+  try {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    L('Context state: ' + ctx.state);
+    L('Sample rate: ' + ctx.sampleRate);
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.value = 440;
+    g.gain.value = 0.3;
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start();
+    o.stop(ctx.currentTime + 1);
+    L('Oscillator started. You should hear a tone for 1 second.');
+    L('Context state after start: ' + ctx.state);
+  } catch(e) { L('ERROR: ' + e.message); }
+};
+
+document.getElementById('btn2').onclick = function() {
+  L('--- Test 2: With Resume ---');
+  try {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    L('Context state before resume: ' + ctx.state);
+    ctx.resume().then(function() {
+      L('Context state after resume: ' + ctx.state);
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = 523;
+      g.gain.value = 0.3;
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start();
+      o.stop(ctx.currentTime + 1);
+      L('Oscillator started after resume. You should hear a tone.');
+    });
+  } catch(e) { L('ERROR: ' + e.message); }
+};
+
+document.getElementById('btn3').onclick = function() {
+  L('--- Test 3: Silent Buffer + Tone ---');
+  try {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    ctx.resume().then(function() {
+      L('Resumed. State: ' + ctx.state);
+      // Silent buffer trick
+      const buf = ctx.createBuffer(1, 1, 22050);
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.connect(ctx.destination);
+      src.start(0);
+      L('Silent buffer played');
+      // Now play real tone
+      setTimeout(function() {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.value = 660;
+        g.gain.value = 0.3;
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start();
+        o.stop(ctx.currentTime + 1);
+        L('Tone started after silent buffer. State: ' + ctx.state);
+      }, 100);
+    });
+  } catch(e) { L('ERROR: ' + e.message); }
+};
+
+document.getElementById('btn4').onclick = function() {
+  L('--- Test 4: Delayed ---');
+  try {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    L('State: ' + ctx.state);
+    ctx.resume().then(function() {
+      L('Resumed. State: ' + ctx.state);
+      L('Playing in 500ms...');
+      setTimeout(function() {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.value = 880;
+        g.gain.setValueAtTime(0, ctx.currentTime);
+        g.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05);
+        g.gain.setValueAtTime(0.3, ctx.currentTime + 0.9);
+        g.gain.linearRampToValueAtTime(0, ctx.currentTime + 1);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start();
+        o.stop(ctx.currentTime + 1.1);
+        L('Tone with envelope started. State: ' + ctx.state);
+      }, 500);
+    });
+  } catch(e) { L('ERROR: ' + e.message); }
+};
+
+L('Page loaded. UserAgent: ' + navigator.userAgent.substring(0, 80));
+L('Tap buttons to test audio.');
+</script>
+</body></html>
